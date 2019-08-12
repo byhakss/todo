@@ -1,31 +1,39 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Dimensions,
   StyleSheet,
-  TextInput,
-} from 'react-native';
-import PropTypes from 'prop-types';
+  TextInput
+} from "react-native";
+import PropTypes from "prop-types";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 export default class Todo extends Component {
-  state = {
-    isEditing: false,
-    isCompleted: false,
-    toDoValue: '',
+  constructor(props) {
+    super(props);
+    this.state = {
+      isEditing: false,
+      isCompleted: false,
+      toDoValue: props.text
+    };
+  }
+
+  static propTypes = {
+    text: PropTypes.string.isRequired,
+    isCompleted: PropTypes.bool.isRequired,
+    deleteTodo: PropTypes.func.isRequired,
+    id: PropTypes.string.isRequired,
+    uncompleteTodo: PropTypes.func.isRequired,
+    completeTodo: PropTypes.func.isRequired,
+    updateTodo: PropTypes.func.isRequired
   };
 
-  /*
-  static propTypes = {
-    toDoValue: PropTypes.string.isRequired,
-  };*/
-
   render() {
-    const { isCompleted, isEditing, toDoValue } = this.state;
-    const { text } = this.props;
+    const { isEditing, toDoValue } = this.state;
+    const { text, id, deleteTodo, isCompleted } = this.props;
 
     return (
       <View style={styles.container}>
@@ -34,75 +42,100 @@ export default class Todo extends Component {
             <View
               style={[
                 styles.circle,
-                isCompleted ? styles.completedCircle : styles.uncompletedCircle,
+                isCompleted ? styles.completedCircle : styles.uncompletedCircle
               ]}
             />
           </TouchableOpacity>
           {isEditing ? (
             <TextInput
-              style={styles.input}
+              style={[
+                styles.text,
+                styles.input,
+                isCompleted ? styles.completedText : styles.uncompletedText
+              ]}
               value={toDoValue}
               multiline={true}
+              onChangeText={this._controllInput}
+              returnKeyType={"done"}
+              onBlur={this._finishEditing}
             />
           ) : (
             <Text
               style={[
                 styles.text,
-                isCompleted ? styles.completedText : styles.uncompletedText,
+                isCompleted ? styles.completedText : styles.uncompletedText
               ]}
             >
               {text}
             </Text>
           )}
         </View>
-        <View style={styles.column}>
-          {isEditing ? (
-            <View style={styles.actions}>
-              <TouchableOpacity onPressOut={this._finishEditing}>
-                <View style={styles.actionContainer}>
-                  <Text style={styles.actionText}>✔</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.actions}>
-              <TouchableOpacity onPressOut={this._startEditing}>
-                <View style={styles.actionContainer}>
-                  <Text style={styles.actionText}>🖊️</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this._toggleComplete}>
-                <View style={styles.actionContainer}>
-                  <Text style={styles.actionText}>❌</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+        {isEditing ? (
+          <View style={styles.actions}>
+            <TouchableOpacity onPressOut={this._finishEditing}>
+              <View style={styles.actionContainer}>
+                <Text style={styles.actionText}>✔</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.actions}>
+            <TouchableOpacity onPressOut={this._startEditing}>
+              <View style={styles.actionContainer}>
+                <Text style={styles.actionText}>✏️</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPressOut={event => {
+                event.stopPropagation();
+                deleteTodo(id);
+              }}
+            >
+              <View style={styles.actionContainer}>
+                <Text style={styles.actionText}>❌</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   }
 
-  _toggleComplete = () => {
+  _toggleComplete = event => {
+    event.stopPropagation();
+    const { id, isCompleted, uncompleteTodo, completeTodo } = this.props;
+    if (isCompleted) {
+      uncompleteTodo(id);
+    } else {
+      completeTodo(id);
+    }
     this.setState(prevState => {
       return {
-        isCompleted: !prevState.isCompleted,
+        isCompleted: !prevState.isCompleted
       };
     });
   };
 
-  _startEditing = () => {
-    const text = this.props;
-
+  _startEditing = event => {
+    event.stopPropagation();
     this.setState({
-      isEditing: true,
-      toDoValue: text,
+      isEditing: true
     });
   };
 
-  _finishEditing = () => {
+  _finishEditing = event => {
+    event.stopPropagation();
+    const { toDoValue } = this.state;
+    const { id, updateTodo } = this.props;
+    updateTodo(id, toDoValue);
     this.setState({
-      isEditing: false,
+      isEditing: false
+    });
+  };
+
+  _controllInput = text => {
+    this.setState({
+      toDoValue: text
     });
   };
 }
@@ -110,52 +143,52 @@ export default class Todo extends Component {
 const styles = StyleSheet.create({
   container: {
     width: width - 50,
-    borderBottomColor: '#bbb',
+    borderBottomColor: "#bbb",
     borderBottomWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
   },
   circle: {
     width: 30,
     height: 30,
     borderRadius: 15,
     borderWidth: 3,
-    marginRight: 20,
+    marginRight: 20
   },
   completedCircle: {
-    borderColor: '#bbb',
+    borderColor: "#bbb"
   },
   uncompletedCircle: {
-    borderColor: '#F23657',
+    borderColor: "#F23657"
   },
   text: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 20,
-    marginVertical: 20,
+    marginVertical: 20
   },
   completedText: {
-    color: '#bbb',
-    textDecorationLine: 'line-through',
+    color: "#bbb",
+    textDecorationLine: "line-through"
   },
   uncompletedText: {
-    color: '#353839',
+    color: "#353839"
   },
   column: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: width / 2,
+    flexDirection: "row",
+    alignItems: "center",
+    width: width / 2
   },
   actions: {
-    flexDirection: 'row',
+    flexDirection: "row"
   },
   actionContainer: {
     marginVertical: 10,
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   input: {
     width: width / 2,
     marginVertical: 15,
-    paddingBottom: 5,
-  },
+    paddingBottom: 5
+  }
 });

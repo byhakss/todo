@@ -14,14 +14,15 @@ module.exports = {
   parser: 'babel-eslint',
   plugins: ['prettier', 'react'],
   rules: {
-    indent: ['warn', 4],
-    'react/jsx-indent': ['warn', 4, { checkAttributes: true }],
+    'import/no-extraneous-dependencies': 'off',
+    'import/prefer-default-export': 'off',
     'react/react-in-jsx-scope': 'off',
     'react/destructuring-assignment': 'off',
+    'no-confusing-arrow': 'off',
     'no-use-before-define': 'off',
+    'arrow-parens': ['error', 'as-needed'],
     'no-nested-ternary': 'warn',
     'react/prop-types': 'warn',
-    'eslint-disable': 'no-unused-vars',
     'prettier/prettier': [
       'error',
       {},

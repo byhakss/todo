@@ -4,27 +4,28 @@
     "slug": "todo",
     "privacy": "public",
     "sdkVersion": "34.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
+    "description": "Sample App",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2c3e50"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.deonlab.byhaks",
+      "buildNumber": "1"
+    },
+    "android": {
+      "versionCode": 1,
+      "package": "co.deonlab.byhaks"
     }
   }
 }
